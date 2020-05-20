@@ -1,0 +1,41 @@
+---
+# defaults file for coffeesprout.consul
+
+consul_datacenter: "dc1"
+#Consul datacenter; see https://www.consul.io/docs/agent/options.html#_datacenter
+
+download_cache: "~/consul-downloads"
+#Where to store the consul downloads
+
+consul_dependencies:
+- unzip
+#We need to be able to unarchive, which requires the zip binary
+
+consul_version: "1.7.3"
+#Generally the latest stable version we can find
+
+consul_arch: "amd64"
+#Default to the AMD64 arch
+
+consul_system: "{{ ansible_system | lower }}"
+#Will automatically select linux or freebsd
+
+consul_archive_name: "consul_{{ consul_version }}_{{ consul_system }}_{{ consul_arch}}.zip"
+#The name of the zip file containing Consul
+
+consul_download_url: "https://releases.hashicorp.com/consul/{{ consul_version }}/{{ consul_archive_name }}"
+#Where to download Consul
+
+consul_checksums_url: "sha256:https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_SHA256SUMS"
+#Where to find the checksums.txt to validate the download
+
+consul_home: /usr/local/etc/consul.d
+#The home folder containing the Consul configuration
+
+consul_data_dir: /opt/consul
+#The folder containing the consul data
+
+consul_retry_join: "{{ groups['consul-servers']|map('extract', hostvars, ['ansible_default_ipv4','address'] )| list }}"
+#By default we populate the retry_join list with all the server IP's. We assume you are using an internal network to provision Ansible, but feel free to change this variable. Just offer it as a list of IP's
+consul_client_addr: "127.0.0.1 {{ ansible_all_ipv4_addresses | ipaddr('private') | list | join(' ') }}"
+#Where to bind the client_addr, default to localhost and all private IP's

@@ -1,0 +1,14 @@
+datacenter = "{{ consul_datacenter }}"
+data_dir = "{{ consul_data_dir }}"
+encrypt = "{{ consul_encryption_key }}"
+
+client_addr = "{{ consul_client_addr }}"
+retry_join = {{ consul_retry_join | to_json}}
+
+{% if 'consul-servers' in group_names %}
+advertise_addr = "{{ ansible_default_ipv4.address }}"
+server = true
+enable_script_checks = true
+ui = true
+bootstrap_expect = {{ groups['consul-servers'] | length }}
+{% endif %}
