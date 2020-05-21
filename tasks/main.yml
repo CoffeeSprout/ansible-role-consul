@@ -60,6 +60,14 @@
     daemon_reload: yes
   when: "systemd_unit_created is changed"
 
+- name: ensure rc.d folder for FreeBSD
+  file:
+    path: /usr/local/etc/rc.d/
+    owner: root
+    group: wheel
+    state: directory
+  when: "'FreeBSD' in ansible_system"
+
 - name: ensure rc.d config for FreeBSD
   template:
     src: consul.rc.j2

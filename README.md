@@ -12,7 +12,7 @@ Requirements
 
 You will need to generate a Consul encryption key. Generally I have the Consul binary locally or you could use docker, have a look at the [official documentation](https://www.consul.io/docs/agent/encryption.html)
 I use the key from their example in my example, please generate your own :-)
-
+The defaults also require netaddr to be installed on the Ansible controller; Either override them or install the pip module
 
 Role Variables
 --------------
