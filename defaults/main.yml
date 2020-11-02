@@ -11,7 +11,7 @@ consul_dependencies:
 - unzip
 #We need to be able to unarchive, which requires the zip binary
 
-consul_version: "1.7.3"
+consul_version: "1.8.5"
 #Generally the latest stable version we can find
 
 consul_arch: "amd64"

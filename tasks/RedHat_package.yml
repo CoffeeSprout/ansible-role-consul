@@ -1,0 +1,18 @@
+---
+# tasks file for installing the yum repo and package for coffeesprout.consul
+- name: setup HashiCorp repository
+  get_url:
+    url: "{{ hashicorp_repo_url | default('https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo') }}"
+    dest: /etc/yum.repos.d/hashicorp.repo
+  tags:
+  - repo
+  - package
+  - redhat
+
+- name: install Consul using Yum
+  yum:
+    name: consul
+    state: present
+  tags:
+  - package
+  - redhat

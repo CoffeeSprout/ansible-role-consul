@@ -1,86 +1,46 @@
 ---
 # tasks file for coffeesprout.consul
 
+- name: ensure OS specifc vars are loaded for {{ ansible_os_family }}
+  include_vars:
+    file: "{{ ansible_os_family }}.yml"
+  tags:
+  - vars
+
 - name: ensure depedencies are available
   package:
     name: "{{ consul_dependencies }}"
     state: present
+  tags:
+  - package
+  - dependencies
 
-- name: ensure downloads folder is available
+- name: install Consul using package for Redhat
+  include_tasks: RedHat_package.yml
+  when:
+  - "'RedHat' in ansible_os_family"
+  - "'package' in consul_install_method" 
+
+- name: install Consul using manual install
+  include_tasks: manual_install.yml
+  when:
+  - "'manual' in consul_install_method" 
+
+- name: ensure consul data and home directory
   file:
-    state: directory
-    recurse: True
-    path: "{{ download_cache }}"
-
-- name: Download the correct version of Consul
-  get_url:
-    url: "{{ consul_download_url }}"
-    dest: "{{ download_cache }}"
-    checksum: "{{ consul_checksums_url }}"
-#See also: https://github.com/ansible/ansible/issues/48790
-
-- name: ensure Consul group
-  group:
-    name: "consul"
-    state: present
-
-- name: ensure Consul user
-  user:
-    name: "consul"
-    comment: "Consul user"
-    group: "consul"
-    system: true
-    home: "{{ consul_home }}"
-
-- name: install Consul to the path
-  unarchive:
-    remote_src: True
-    src: "{{ download_cache }}/{{ consul_archive_name }}"
-    dest: /usr/local/bin/
-    owner: root
-    mode: "0755"
-
-- name: ensure consul data directory
-  file:
-    path: "{{ consul_data_dir }}"
+    path: "{{ item }}"
     state: directory
     recurse: True
     owner: consul
     group: consul
-
-- name: ensure systemd unit for Linux
-  template:
-    src: consul.service.j2
-    dest: /etc/systemd/system/consul.service
-  register: systemd_unit_created
-  when: "'Linux' in ansible_system"
-
-- name: ensure systemd has loaded the config
-  systemd:
-    daemon_reload: yes
-  when: "systemd_unit_created is changed"
-
-- name: ensure rc.d folder for FreeBSD
-  file:
-    path: /usr/local/etc/rc.d/
-    owner: root
-    group: wheel
-    state: directory
-  when: "'FreeBSD' in ansible_system"
-
-- name: ensure rc.d config for FreeBSD
-  template:
-    src: consul.rc.j2
-    dest: /usr/local/etc/rc.d/consul
-    owner: root
-    group: wheel
-    mode: "0555"
-  when: "'FreeBSD' in ansible_system"
+  with_items:
+  - "{{ consul_data_dir }}"
+  - "{{ consul_home }}"
 
 - name: ensure consul configuration is present
   template:
     src: consul.hcl.j2
-    dest: /usr/local/etc/consul.d/consul.hcl
+    dest: "{{ consul_home }}/consul.hcl"
     owner: consul
     group: consul
 
