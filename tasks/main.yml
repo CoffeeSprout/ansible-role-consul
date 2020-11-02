@@ -16,7 +16,7 @@
   - dependencies
 
 - name: install Consul using package for Redhat
-  include_tasks: Redhat_package.yml
+  include_tasks: RedHat_package.yml
   when:
   - "'RedHat' in ansible_os_family"
   - "'package' in consul_install_method" 
@@ -26,18 +26,21 @@
   when:
   - "'manual' in consul_install_method" 
 
-- name: ensure consul data directory
+- name: ensure consul data and home directory
   file:
-    path: "{{ consul_data_dir }}"
+    path: "{{ item }}"
     state: directory
     recurse: True
     owner: consul
     group: consul
+  with_items:
+  - "{{ consul_data_dir }}"
+  - "{{ consul_home }}"
 
 - name: ensure consul configuration is present
   template:
     src: consul.hcl.j2
-    dest: /usr/local/etc/consul.d/consul.hcl
+    dest: "{{ consul_home }}/consul.hcl"
     owner: consul
     group: consul
 
