@@ -1,0 +1,56 @@
+---
+# tasks file that handles the non-package install for coffeesprout.consul
+
+- name: ensure downloads folder is available
+  file:
+    state: directory
+    recurse: True
+    path: "{{ download_cache }}"
+  tags:
+  - cache
+
+- name: Download the correct version of Consul
+  get_url:
+    url: "{{ consul_download_url }}"
+    dest: "{{ download_cache }}"
+    checksum: "{{ consul_checksums_url }}"
+#See also: https://github.com/ansible/ansible/issues/48790
+  tags:
+  - download
+
+- name: ensure Consul group
+  group:
+    name: "consul"
+    state: present
+  tags:
+  - user
+  - group
+
+- name: ensure Consul user
+  user:
+    name: "consul"
+    comment: "Consul user"
+    group: "consul"
+    system: true
+    home: "{{ consul_home }}"
+  tags:
+  - user
+
+- name: install Consul to the path
+  unarchive:
+    remote_src: True
+    src: "{{ download_cache }}/{{ consul_archive_name }}"
+    dest: /usr/local/bin/
+    owner: root
+    mode: "0755"
+  tags:
+  - manual
+  - install
+
+- name: ensure systemd unit for Linux
+  include_tasks: Linux_systemd.yml 
+  when: "'Linux' in ansible_system"
+
+- name: ensure rc.d config for FreeBSD
+  include_tasks: FreeBSD_service.yml
+  when: "'FreeBSD' in ansible_system"

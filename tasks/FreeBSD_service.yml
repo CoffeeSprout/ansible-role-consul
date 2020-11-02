@@ -1,0 +1,23 @@
+---
+# FreeBSD specific tasks file for coffeesprout.consul
+
+- name: ensure rc.d folder for FreeBSD
+  file:
+    path: /usr/local/etc/rc.d/
+    owner: root
+    group: wheel
+    state: directory
+  tags:
+  - freebsd
+  - service
+
+- name: ensure rc.d config for FreeBSD
+  template:
+    src: consul.rc.j2
+    dest: /usr/local/etc/rc.d/consul
+    owner: root
+    group: wheel
+    mode: "0555"
+  tags:
+  - freebsd
+  - service
