@@ -1,3 +1,12 @@
-[consul-servers]
-thuis consul_arch=386
-centos7-test.coffeesprout.cloud
+[lab]
+freebsd13-lab
+centos7-lab
+alma8-lab
+rocky8-lab
+#debian11-lab
+
+[consul-servers:children]
+lab
+
+[hypervisor]
+neptune

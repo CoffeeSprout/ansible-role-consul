@@ -48,10 +48,12 @@
   service:
     name: consul
     state: started
+    enabled: True
   when: "'consul-servers' in group_names"
 
 - name: ensure consul service is started on clients
   service:
     name: consul
     state: started
+    enabled: True
   when: "'consul-clients' in group_names"

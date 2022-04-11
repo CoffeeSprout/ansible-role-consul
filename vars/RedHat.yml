@@ -1,1 +1,2 @@
+consul_home: /etc/consul.d
 consul_install_method: package

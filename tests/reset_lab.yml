@@ -1,0 +1,23 @@
+---
+
+- hosts: neptune
+  vars:
+    servers:
+    - 101
+    - 103
+    - 104
+    - 105
+    - 108
+  tasks:
+  - name: revert {{ item }} to initial
+    shell: "qm rollback {{ item }} initial"
+    with_items: "{{ servers }}"
+  - name: start {{ item }}
+    shell: qm start {{ item }}
+    with_items: "{{ servers }}"
+
+- hosts: lab
+  gather_facts: False
+  tasks:
+  - wait_for_connection:
+  
